@@ -1,10 +1,10 @@
 // import { Component } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 import CardList from "./components/card-list/card-list.component";
 import SearchBox from "./components/search-box/search-box.component";
 import "./App.css";
-
+import { getData } from "./utils/data.utils";
 //Webpack is a MODULAR BUNDLER
 // https://jsonplaceholder.typicode.com/users
 
@@ -12,6 +12,13 @@ import "./App.css";
 Functions do NOT use CONSTRUCTORS, constructors only in CLASS COMPONENTS.
 The functional component SIMPLY RUNS like a NORMAL JavaScript Function, it RUNS FROM TOP TO BOTTOM, and thats it
 */
+
+export type Monster = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 const App = () => {
   /*
   const [] = useState(); is similar to:
@@ -22,16 +29,23 @@ const App = () => {
   // Gives back an array of 2 Values
   const [searchField, setSearchField] = useState(""); //returns 2 values [value, setValue]
   const [title, setTitle] = useState("");
-  const [monsters, setMonsters] = useState([]);
+  //We are getting an initial state of a monster array
+  const [monsters, setMonsters] = useState<Monster[]>([]);
   const [filteredMonsters, setFilteredMonsters] = useState(monsters);
   // const [stringField, setStringField] = useState("");
   // console.log({ searchField });
 
   // This says, you should ONLY call this FUNCTION, is ON MOUNT. We are passing NO DEPENDENCIES
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((users) => setMonsters(users));
+    // fetch("https://jsonplaceholder.typicode.com/users")
+    //   .then((response) => response.json())
+    //   .then((users) => setMonsters(users));
+
+    const fetchUsers = async () => {
+      // <Monster[]> -> An array of monsters
+      const users = await getData<Monster[]>("https://jsonplaceholder.typicode.com/users");
+      setMonsters(users);
+    };
   }, []);
 
   useEffect(() => {
@@ -42,13 +56,13 @@ const App = () => {
     setFilteredMonsters(newFilteredMonsters);
   }, [monsters, searchField]);
 
-  const onSearchChange = (event) => {
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     // LOWERCASES STRING from value we grabbed
     const searchFieldString = event.target.value.toLocaleLowerCase();
     setSearchField(searchFieldString);
   };
 
-  const onTitleChange = (event) => {
+  const onTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     // LOWERCASES STRING from value we grabbed
     const searchFieldString = event.target.value.toLocaleLowerCase();
     setTitle(searchFieldString);
